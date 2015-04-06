@@ -25,7 +25,7 @@ public class Serveur {
 		catch (IOException e) {
 			System.out.println(e.getMessage()+" 02");
 		}//catch
-		System.out.println("En Ã©coute sur le port : " + PORT );
+		System.out.println("En écoute sur le port : " + PORT );
 		while (ok) {
 			try {
 				Connect co = new Connect(server.accept());
