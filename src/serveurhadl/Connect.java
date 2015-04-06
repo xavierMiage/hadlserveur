@@ -33,25 +33,32 @@ public class Connect implements Runnable {
 
 		JSONObject json = new JSONObject();
 		json = Connect.this.read();
-		System.out.println(json);
 		
 		String id = (String) json.get("id");
+		String nom = (String) json.get("nom");
+		String article = (String) json.get("id_article");
 		
-		System.out.println(id);
-		/*MySQLAccess dao = new MySQLAccess();
+		UserSql user = new UserSql();
 		try {
-			dao.readDataBase();
+			user.readDataBase();
+			if(!user.authorized(id, nom)) {
+				json.clear();
+				json.put("error", "Vous n'avez pas les droits de vous connecter.");
+				Connect.this.send(json.toJSONString());
+				this.socket.close();
+				this.thd.destroy();
+			}
+			else {
+				ArticleSql art = new ArticleSql();
+				art.readDataBase();
+				json = art.select("Select * from article where idarticle = " + article);
+				
+				Connect.this.send(json.toJSONString());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-			
-		json.put("name", "foo");
-		json.put("num", new Integer(100));
-		json.put("balance", new Double(1000.21));
-		json.put("is_vip", new Boolean(true));
-
-	    Connect.this.send(json.toJSONString());
+		}
  
 			/*while (true){
 				try {
@@ -118,7 +125,6 @@ public class Connect implements Runnable {
 			Map<String,String> map = new HashMap<String,String>();
 			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			String message = input.readLine();
-			System.out.println("ici");
 			map = mapper.readValue(message, new TypeReference<HashMap<String,String>>(){});
 			JSONObject json = new JSONObject(map);
 			return json;

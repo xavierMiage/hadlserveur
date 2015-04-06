@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.json.simple.JSONObject;
+
 /**
  * 
  */
@@ -17,11 +19,11 @@ import java.sql.Statement;
  *
  */
 
-public class MySQLAccess {
+public abstract class MySQLAccess {
 
-	private Connection connect = null;
-	private Statement statement = null;
-	private PreparedStatement preparedStatement, preparedStatement2 = null;
+	protected Connection connect = null;
+	protected Statement statement = null;
+	protected PreparedStatement preparedStatement, preparedStatement2 = null;
 	private ResultSet resultSet = null;
 
 	public void readDataBase() throws Exception {
@@ -30,50 +32,52 @@ public class MySQLAccess {
 			Class.forName("com.mysql.jdbc.Driver");
 			// Setup the connection with the DB
 			connect = DriverManager
-					.getConnection("jdbc:mysql://localhost/test?"
+					.getConnection("jdbc:mysql://localhost/hadl?"
 							+ "user=root&password=root");
 			connect.setAutoCommit(true);
 
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
-			// Result set get the result of the SQL query
-			resultSet = statement.executeQuery("select * from test.comments");
-			writeResultSet(resultSet);
 
 			// PreparedStatements can use variables and are more efficient
-			preparedStatement = connect
-					.prepareStatement("insert into  test.comments values (default, ?, ?, ?, ? , ?, ?)");
+			//preparedStatement = connect
+			//		.prepareStatement("insert into  test.comments values (default, ?, ?, ?, ? , ?, ?)");
 			// "myuser, webpage, datum, summary, COMMENTS from test.comments");
 			// Parameters start with 1
-			preparedStatement.setString(1, "Test");
-			preparedStatement.setString(2, "TestEmail");
-			preparedStatement.setString(3, "TestWebpage");
-			preparedStatement.setDate(4,
-					new Date(new java.util.Date().getTime()));
-			preparedStatement.setString(5, "TestSummary");
-			preparedStatement.setString(6, "TestComment");
-			preparedStatement.executeUpdate();
+			//preparedStatement.setString(1, "Test");
+			//preparedStatement.setString(2, "TestEmail");
+			//preparedStatement.setString(3, "TestWebpage");
+			//preparedStatement.setDate(4,
+			//		new Date(new java.util.Date().getTime()));
+			//preparedStatement.setString(5, "TestSummary");
+			//preparedStatement.setString(6, "TestComment");
+			//preparedStatement.executeUpdate();
 
-			preparedStatement = connect
-					.prepareStatement("SELECT myuser, webpage, datum, summary, COMMENTS from test.comments");
-			resultSet = preparedStatement.executeQuery();
-			writeResultSet(resultSet);
+			//preparedStatement = connect
+			//		.prepareStatement("SELECT myuser, webpage, datum, summary, COMMENTS from test.comments");
+			//resultSet = preparedStatement.executeQuery();
+			//writeResultSet(resultSet);
 
 			// Remove again the insert comment
-			preparedStatement2 = connect
-					.prepareStatement("delete from test.comments where myuser= ? ; ");
-			preparedStatement2.setString(1, "Test");
+			//preparedStatement2 = connect
+			//		.prepareStatement("delete from test.comments where myuser= ? ; ");
+			//preparedStatement2.setString(1, "Test");
 			// preparedStatement2.executeUpdate();
 
-			resultSet = statement.executeQuery("select * from test.comments");
-			writeMetaData(resultSet);
+			//resultSet = statement.executeQuery("select * from test.comments");
+			//writeMetaData(resultSet);
 
 		} catch (Exception e) {
 			throw e;
-		} finally {
-			close();
-		}
+		} 
+		//finally {
+		//	close();
+		//}*/
 
+	}
+	
+	public JSONObject select(String select) throws SQLException {
+		return null;
 	}
 
 	private void writeMetaData(ResultSet resultSet) throws SQLException {
