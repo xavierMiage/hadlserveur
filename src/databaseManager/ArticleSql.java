@@ -1,4 +1,4 @@
-package serveurhadl;
+package databaseManager;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import org.json.simple.JSONObject;
 
-public class ArticleSql extends MySQLAccess {
+public class ArticleSql extends DatabaseManager {
 	
 	@Override
 	public JSONObject select(String select) throws SQLException {

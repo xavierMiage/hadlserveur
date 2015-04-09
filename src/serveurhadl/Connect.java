@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,16 +16,24 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.json.simple.JSONObject;
 
+import securityManager.MySecurityManager;
+import databaseManager.ArticleSql;
+import databaseManager.DatabaseManager;
+import databaseManager.UserSql;
+
 public class Connect implements Runnable {
 	private Thread thd ;
 	private Socket socket ;
 	private PrintWriter out ;
+	private Configuration conf;
 	//private InputStream in  ;
  
 	private static ArrayList<Connect> listC = new ArrayList<Connect>(1);
 	public Connect (Socket socket_) {
 		listC.add(this);
 		socket = socket_ ;
+		this.conf = new Configuration("mysql://localhost/hadl?"
+				+ "user=root&password=root");
 		thd = new Thread (this) ;
 		thd.start();
 	}//connect
@@ -38,26 +47,27 @@ public class Connect implements Runnable {
 		String nom = (String) json.get("nom");
 		String article = (String) json.get("id_article");
 		
-		UserSql user = new UserSql();
-		try {
-			user.readDataBase();
-			if(!user.authorized(id, nom)) {
-				json.clear();
-				json.put("error", "Vous n'avez pas les droits de vous connecter.");
-				Connect.this.send(json.toJSONString());
+		if(!this.conf.getProtect().isAuthorized(id, nom, this.conf.getDb().getUser())) {
+			json.clear();
+			json.put("error", "Vous n'avez pas les droits de vous connecter.");
+			Connect.this.send(json.toJSONString());
+			try {
 				this.socket.close();
-				this.thd.destroy();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			else {
-				ArticleSql art = new ArticleSql();
-				art.readDataBase();
-				json = art.select("Select * from article where idarticle = " + article);
-				
-				Connect.this.send(json.toJSONString());
+			this.thd.destroy();
+		}
+		else {
+			try {
+				json = this.conf.getDb().getArticle().select("Select * from article where idarticle = " + article);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				json.put("error", "Un problème est survenu.");
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			Connect.this.send(json.toJSONString());
 		}
  
 			/*while (true){
